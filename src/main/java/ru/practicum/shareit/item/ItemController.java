@@ -13,14 +13,15 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping
-    public Collection<ItemDto> getAllItemOfUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemDto> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemService.getAllItemOfUser(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
+    public ItemDto getItemById(@RequestHeader(USER_ID_HEADER) long userId, @PathVariable long itemId) {
         return itemService.getItemById(userId, itemId);
     }
 
@@ -30,13 +31,13 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") int userId,
+    public ItemDto createItem(@RequestHeader(USER_ID_HEADER) int userId,
                               @Valid @RequestBody ItemDto itemDto) {
         return itemService.createItem(itemDto, userId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemDto updateItem(@RequestHeader(USER_ID_HEADER) long userId,
                               @PathVariable long itemId,
                               @RequestBody ItemDto itemDto) {
         return itemService.updateItem(itemDto, userId, itemId);

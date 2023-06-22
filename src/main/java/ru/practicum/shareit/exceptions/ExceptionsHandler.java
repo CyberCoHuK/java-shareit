@@ -14,23 +14,21 @@ public class ExceptionsHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
-        log.warn(e.getMessage());
-        return new ErrorResponse(
-                e.getMessage()
-        );
+        log.warn("ValidationException: " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectNotFoundException(final ObjectNotFoundException e) {
-        log.warn(e.getMessage());
+        log.warn("ObjectNotFoundException: " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleObjectAlreadyExist(final ObjectAlreadyExistException e) {
-        log.warn(e.getMessage());
+        log.warn("ObjectAlreadyExistException: " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }

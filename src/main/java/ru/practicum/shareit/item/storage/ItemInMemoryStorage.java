@@ -2,16 +2,14 @@ package ru.practicum.shareit.item.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -45,12 +43,11 @@ public class ItemInMemoryStorage implements ItemStorage {
             return Collections.emptyList();
         }
         log.info("Возвращен список вещей по запросу: {}", text);
-        String request = text.toLowerCase();
         return items.values()
                 .stream()
                 .filter(Item::getAvailable)
-                .filter(item -> item.getName().toLowerCase().contains(request)
-                        || item.getDescription().toLowerCase().contains(request))
+                .filter(item -> StringUtils.containsIgnoreCase(item.getName(), text)
+                        || StringUtils.containsIgnoreCase(item.getDescription(), text))
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -68,15 +65,10 @@ public class ItemInMemoryStorage implements ItemStorage {
         isExist(itemId);
         haveUserItem(itemId, userId);
         Item updateItem = items.get(itemId);
-        if (itemDto.getName() != null) {
-            updateItem.setName(itemDto.getName());
-        }
-        if (itemDto.getDescription() != null) {
-            updateItem.setDescription(itemDto.getDescription());
-        }
-        if (itemDto.getAvailable() != null) {
-            updateItem.setAvailable(itemDto.getAvailable());
-        }
+        Optional.ofNullable(itemDto.getName()).ifPresent(item -> updateItem.setName(itemDto.getName()));
+        Optional.ofNullable(itemDto.getDescription())
+                .ifPresent(item -> updateItem.setDescription(itemDto.getDescription()));
+        Optional.ofNullable(itemDto.getAvailable()).ifPresent(item -> updateItem.setAvailable(itemDto.getAvailable()));
         items.replace(itemId, updateItem);
         log.info("Обновлена вещь с индентификатором {}", itemId);
         return ItemMapper.toItemDto(items.get(itemId));
