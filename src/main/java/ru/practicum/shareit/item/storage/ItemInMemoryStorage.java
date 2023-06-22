@@ -65,10 +65,9 @@ public class ItemInMemoryStorage implements ItemStorage {
         isExist(itemId);
         haveUserItem(itemId, userId);
         Item updateItem = items.get(itemId);
-        Optional.ofNullable(itemDto.getName()).ifPresent(item -> updateItem.setName(itemDto.getName()));
-        Optional.ofNullable(itemDto.getDescription())
-                .ifPresent(item -> updateItem.setDescription(itemDto.getDescription()));
-        Optional.ofNullable(itemDto.getAvailable()).ifPresent(item -> updateItem.setAvailable(itemDto.getAvailable()));
+        Optional.ofNullable(itemDto.getName()).ifPresent(updateItem::setName);
+        Optional.ofNullable(itemDto.getDescription()).ifPresent(updateItem::setDescription);
+        Optional.ofNullable(itemDto.getAvailable()).ifPresent(updateItem::setAvailable);
         items.replace(itemId, updateItem);
         log.info("Обновлена вещь с индентификатором {}", itemId);
         return ItemMapper.toItemDto(items.get(itemId));
