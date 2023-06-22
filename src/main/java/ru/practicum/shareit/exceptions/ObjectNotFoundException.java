@@ -1,7 +1,7 @@
 package ru.practicum.shareit.exceptions;
 
 public class ObjectNotFoundException extends RuntimeException {
-    public ObjectNotFoundException(String message) {
+    public ObjectNotFoundException(final String message) {
         super(message);
     }
 }

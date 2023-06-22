@@ -9,17 +9,14 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class UserInMemoryStorage implements UserStorage {
-    private final HashMap<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
     private final Set<String> mails = new HashSet<>();
     private long userId = 1L;
 
@@ -54,7 +51,7 @@ public class UserInMemoryStorage implements UserStorage {
         isExist(userId);
         user.setId(userId);
         if (user.getEmail() != null) {
-            if (!user.getEmail().equals(users.get(userId).getEmail())) {
+            if (!Objects.equals(user.getEmail(), users.get(userId).getEmail())) {
                 mailCheck(user.getEmail());
             }
             mails.remove(users.get(userId).getEmail());
