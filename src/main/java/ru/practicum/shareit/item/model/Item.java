@@ -1,19 +1,22 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
 @Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
+@Table(name = "items")
 public class Item {
     @PositiveOrZero
     @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotBlank(message = "Отсутствует название вещи")
     private String name;
@@ -21,6 +24,8 @@ public class Item {
     private String description;
     @NotNull
     private Boolean available;
+    @Column(name = "owner_id")
     private Long owner;
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Long request;
 }

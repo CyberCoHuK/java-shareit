@@ -1,7 +1,9 @@
 package ru.practicum.shareit.item.dto;
 
-import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
@@ -22,5 +24,5 @@ public class ItemDto {
     @NotNull
     @AssertTrue
     private Boolean available;
-    private ItemRequest request;
+    private Long request;
 }
