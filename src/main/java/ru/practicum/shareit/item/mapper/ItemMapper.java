@@ -31,8 +31,8 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemDtoResponse toItemDtoWithBooking(Item item, BookingDtoItem next, BookingDtoItem last
-            , List<CommentDtoResponse> comments) {
+    public static ItemDtoResponse toItemDtoWithBooking(Item item, BookingDtoItem next, BookingDtoItem last,
+                                                       List<CommentDtoResponse> comments) {
         return ItemDtoResponse.builder()
                 .id(item.getId())
                 .name(item.getName())
