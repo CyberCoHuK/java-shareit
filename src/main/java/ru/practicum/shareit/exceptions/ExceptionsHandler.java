@@ -31,5 +31,12 @@ public class ExceptionsHandler {
         log.warn("ObjectAlreadyExistException: " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBadRequestException(final BadRequestException e) {
+        log.warn("BadRequestException: " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 }
 
