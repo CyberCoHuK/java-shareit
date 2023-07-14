@@ -6,10 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
-import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.enums.BookingStates;
+import ru.practicum.shareit.enums.Sorts;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -23,8 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.enums.Status.REJECTED;
-import static ru.practicum.shareit.booking.enums.Status.WAITING;
+import static ru.practicum.shareit.enums.BookingStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final Sort sort = Sort.by("start").descending();
+    private final Sort sort = Sorts.START.getSort();
 
     @Transactional
     @Override
@@ -71,7 +71,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getItem().getOwner().getId() != userId) {
             throw new ObjectNotFoundException("Не подходящий индентификатор пользователя: " + userId);
         }
-        booking.setStatus(approved ? Status.APPROVED : REJECTED);
+        booking.setStatus(approved ? APPROVED : REJECTED);
         bookingRepository.save(booking);
         return BookingMapper.toBookingDto(booking);
     }
@@ -90,27 +90,27 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<BookingDto> getAllBookingsByUser(Long userId, String state) {
+    public Collection<BookingDto> getAllBookingsByUser(Long userId, BookingStates state) {
         userRepository.isExist(userId);
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
-            case "ALL":
+            case ALL:
                 bookings.addAll(bookingRepository.findAllByBookerId(userId, sort));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings.addAll(bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(
                         userId, LocalDateTime.now(), LocalDateTime.now(), sort));
                 break;
-            case "PAST":
+            case PAST:
                 bookings.addAll(bookingRepository.findAllByBookerIdAndEndBefore(userId, LocalDateTime.now(), sort));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings.addAll(bookingRepository.findAllByBookerIdAndStartAfter(userId, LocalDateTime.now(), sort));
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings.addAll(bookingRepository.findAllByBookerIdAndStatusEquals(userId, WAITING, sort));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings.addAll(bookingRepository.findAllByBookerIdAndStatusEquals(userId, REJECTED, sort));
                 break;
             default:
@@ -121,28 +121,28 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<BookingDto> getAllBookingsByOwner(Long ownerId, String state) {
+    public Collection<BookingDto> getAllBookingsByOwner(Long ownerId, BookingStates state) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + ownerId + " не существует"));
         List<Booking> bookings = new ArrayList<>();
         switch (state) {
-            case "ALL":
+            case ALL:
                 bookings.addAll(bookingRepository.findAllByItemOwner(owner, sort));
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings.addAll(bookingRepository.findAllByItemOwnerAndStartBeforeAndEndAfter(
                         owner, LocalDateTime.now(), LocalDateTime.now(), sort));
                 break;
-            case "PAST":
+            case PAST:
                 bookings.addAll(bookingRepository.findAllByItemOwnerAndEndBefore(owner, LocalDateTime.now(), sort));
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings.addAll(bookingRepository.findAllByItemOwnerAndStartAfter(owner, LocalDateTime.now(), sort));
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings.addAll(bookingRepository.findAllByItemOwnerAndStatusEquals(owner, WAITING, sort));
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings.addAll(bookingRepository.findAllByItemOwnerAndStatusEquals(owner, REJECTED, sort));
                 break;
             default:

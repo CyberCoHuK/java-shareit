@@ -2,8 +2,8 @@ package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -20,7 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Collection<Booking> findAllByItemOwnerAndStartAfter(User booker, LocalDateTime now, Sort sort);
 
-    Collection<Booking> findAllByItemOwnerAndStatusEquals(User booker, Status waiting, Sort sort);
+    Collection<Booking> findAllByItemOwnerAndStatusEquals(User booker, BookingStatus waiting, Sort sort);
 
     Collection<Booking> findAllByBookerId(Long booker, Sort sort);
 
@@ -31,9 +31,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Collection<Booking> findAllByBookerIdAndStartAfter(Long booker, LocalDateTime now, Sort sort);
 
-    Collection<Booking> findAllByBookerIdAndStatusEquals(Long booker, Status waiting, Sort sort);
+    Collection<Booking> findAllByBookerIdAndStatusEquals(Long booker, BookingStatus waiting, Sort sort);
 
-    Collection<Booking> findAllByItemIdAndBookerIdAndStatusAndStartBefore(long itemId, long bookerId, Status status,
+    Collection<Booking> findAllByItemIdAndBookerIdAndStatusAndStartBefore(long itemId, long bookerId, BookingStatus bookingStatus,
                                                                           LocalDateTime now);
 
     Collection<Booking> findAllByItem(Item item, Sort sort);

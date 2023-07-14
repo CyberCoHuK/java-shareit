@@ -3,8 +3,8 @@ package ru.practicum.shareit.booking.mapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
-import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserMapper;
@@ -16,7 +16,7 @@ public class BookingMapper {
                 .start(bookingDtoShort.getStart())
                 .end(bookingDtoShort.getEnd())
                 .item(item)
-                .status(Status.WAITING)
+                .status(BookingStatus.WAITING)
                 .booker(user)
                 .build();
     }

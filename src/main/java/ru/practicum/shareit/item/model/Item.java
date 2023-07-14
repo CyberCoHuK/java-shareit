@@ -16,12 +16,14 @@ public class Item {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
-    @Column(name = "is_available")
+    @Column(name = "is_available", nullable = false)
     private Boolean available;
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
     @Column(name = "request_id")
     private Long request;

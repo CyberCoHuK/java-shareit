@@ -1,7 +1,7 @@
 package ru.practicum.shareit.booking.model;
 
 import lombok.*;
-import ru.practicum.shareit.booking.enums.Status;
+import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -23,12 +23,13 @@ public class Booking {
     private LocalDateTime start;
     @Column(name = "end_date")
     private LocalDateTime end;
-    @ManyToOne
-    @JoinColumn(name = "item_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
-    @ManyToOne
-    @JoinColumn(name = "booker_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
     @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(name = "status", nullable = false)
+    private BookingStatus status;
 }

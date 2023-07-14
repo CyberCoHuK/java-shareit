@@ -4,11 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
-import ru.practicum.shareit.booking.enums.Status;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.enums.Sorts;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -16,17 +17,19 @@ import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
 import ru.practicum.shareit.item.mapper.CommentMapper;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.enums.BookingStatus.APPROVED;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
-    private final Sort sort = Sort.by("start").descending();
+    private final Sort sort = Sorts.START.getSort();
 
     @Transactional(readOnly = true)
     @Override
@@ -67,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemDto> searchItem(String text) {
-        if (text.isBlank()) {
+        if (StringUtils.isEmpty(text)) {
             return Collections.emptyList();
         }
         return itemRepository.findByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text)
@@ -81,10 +84,20 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         Collection<BookingDtoItem> bookings = bookingRepository.findAllByItem(item, sort)
                 .stream().map(BookingMapper::toBookingDtoItem).collect(Collectors.toList());
-        BookingDtoItem last = bookings.stream().sorted(BOOKING_COMPARATOR).filter(b -> b.getStart().isBefore(now))
-                .reduce((first, second) -> second).stream().findFirst().orElse(null);
-        BookingDtoItem next = bookings.stream().sorted(BOOKING_COMPARATOR).filter(b -> b.getStart().isAfter(now) && b.getStatus().equals(Status.APPROVED))
-                .findFirst().orElse(null);
+        BookingDtoItem last = bookings
+                .stream()
+                .sorted(BOOKING_COMPARATOR)
+                .filter(b -> b.getStart().isBefore(now))
+                .reduce((first, second) -> second)
+                .stream()
+                .findFirst()
+                .orElse(null);
+        BookingDtoItem next = bookings
+                .stream()
+                .sorted(BOOKING_COMPARATOR)
+                .filter(b -> b.getStart().isAfter(now) && b.getStatus().equals(APPROVED))
+                .findFirst()
+                .orElse(null);
         List<CommentDtoResponse> comments = commentRepository.findAllByItemId(item.getId())
                 .stream()
                 .map(CommentMapper::toDtoResponse)
@@ -122,7 +135,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
         Collection<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatusAndStartBefore(itemId,
-                userId, Status.APPROVED, LocalDateTime.now());
+                userId, APPROVED, LocalDateTime.now());
         if (bookings == null || bookings.isEmpty()) {
             throw new BadRequestException("Бронирований не найдено");
         }

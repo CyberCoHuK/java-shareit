@@ -22,7 +22,7 @@ public class BookingDtoShort {
     @FutureOrPresent
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime end;
-    @PositiveOrZero(message = "itemID не может быть меньше ноля")
+    @PositiveOrZero(message = "itemId не может быть меньше ноля")
     @NotNull
     private Long itemId;
 }

@@ -17,12 +17,13 @@ public class Comment {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(name = "text", nullable = false)
     private String text;
-    @ManyToOne
-    @JoinColumn(name = "item_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
-    @ManyToOne
-    @JoinColumn(name = "author_id")
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
     private LocalDateTime created;
 }
