@@ -70,7 +70,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional(readOnly = true)
     @Override
     public Collection<ItemDto> searchItem(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (!StringUtils.hasLength(text)) {
             return Collections.emptyList();
         }
         return itemRepository.findByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text)
