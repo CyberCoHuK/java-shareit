@@ -16,9 +16,9 @@ public class Item {
     @EqualsAndHashCode.Include
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 512)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1000)
     private String description;
     @Column(name = "is_available", nullable = false)
     private Boolean available;

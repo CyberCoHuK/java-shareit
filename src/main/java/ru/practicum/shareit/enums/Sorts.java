@@ -1,15 +1,14 @@
 package ru.practicum.shareit.enums;
 
 import lombok.Getter;
-import org.springframework.data.domain.Sort;
 
 @Getter
 public enum Sorts {
-    START(Sort.by("start").descending());
+    START("start");
 
-    private final Sort sort;
+    private final String sort;
 
-    Sorts(Sort sort) {
+    Sorts(String sort) {
         this.sort = sort;
     }
 }

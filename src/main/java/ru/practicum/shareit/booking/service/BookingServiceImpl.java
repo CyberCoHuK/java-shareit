@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.enums.BookingStates;
-import ru.practicum.shareit.enums.Sorts;
 import ru.practicum.shareit.exceptions.BadRequestException;
 import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.item.model.Item;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.enums.BookingStatus.*;
+import static ru.practicum.shareit.enums.Sorts.START;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
-    private final Sort sort = Sorts.START.getSort();
+    private final Sort sort = Sort.by(START.getSort()).descending();
 
     @Transactional
     @Override
