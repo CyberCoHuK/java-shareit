@@ -1,40 +1,26 @@
 package ru.practicum.shareit.item.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
 
 import java.util.Collection;
 
-@Service
-@RequiredArgsConstructor
-public class ItemService {
-    private final ItemStorage itemStorage;
-    private final UserStorage userStorage;
+public interface ItemService {
+    Collection<ItemDtoResponse> getAllItemOfUser(long userId);
 
-    public Collection<ItemDto> getAllItemOfUser(long userId) {
-        userStorage.isExist(userId);
-        return itemStorage.getAllItemOfUser(userId);
-    }
 
-    public ItemDto getItemById(long userId, long itemId) {
-        userStorage.isExist(userId);
-        return itemStorage.getItemById(itemId);
-    }
+    ItemDtoResponse getItemById(long userId, long itemId);
 
-    public Collection<ItemDto> searchItem(String text) {
-        return itemStorage.searchItem(text);
-    }
 
-    public ItemDto createItem(ItemDto itemDto, long userId) {
-        userStorage.isExist(userId);
-        return itemStorage.createItem(itemDto, userId);
-    }
+    Collection<ItemDto> searchItem(String text);
 
-    public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
-        userStorage.isExist(userId);
-        return itemStorage.updateItem(itemDto, itemId, userId);
-    }
+
+    ItemDto createItem(ItemDto itemDto, long userId);
+
+
+    ItemDto updateItem(ItemDto itemDto, long userId, long itemId);
+
+    CommentDtoResponse createComment(CommentDto commentDto, long userId, long itemId);
 }

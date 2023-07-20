@@ -2,8 +2,11 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemService;
+import ru.practicum.shareit.item.dto.ItemDtoResponse;
+import ru.practicum.shareit.item.service.ItemServiceImpl;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -12,16 +15,16 @@ import java.util.Collection;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemService itemService;
+    private final ItemServiceImpl itemService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping
-    public Collection<ItemDto> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId) {
+    public Collection<ItemDtoResponse> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemService.getAllItemOfUser(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@RequestHeader(USER_ID_HEADER) long userId, @PathVariable long itemId) {
+    public ItemDtoResponse getItemById(@RequestHeader(USER_ID_HEADER) long userId, @PathVariable long itemId) {
         return itemService.getItemById(userId, itemId);
     }
 
@@ -31,7 +34,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader(USER_ID_HEADER) int userId,
+    public ItemDto createItem(@RequestHeader(USER_ID_HEADER) long userId,
                               @Valid @RequestBody ItemDto itemDto) {
         return itemService.createItem(itemDto, userId);
     }
@@ -43,5 +46,10 @@ public class ItemController {
         return itemService.updateItem(itemDto, userId, itemId);
     }
 
-
+    @PostMapping("/{itemId}/comment")
+    public CommentDtoResponse createComment(@RequestHeader(USER_ID_HEADER) long userId,
+                                            @PathVariable long itemId,
+                                            @Valid @RequestBody CommentDto commentDto) {
+        return itemService.createComment(commentDto, userId, itemId);
+    }
 }

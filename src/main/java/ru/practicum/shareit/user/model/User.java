@@ -2,21 +2,21 @@ package ru.practicum.shareit.user.model;
 
 import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import javax.persistence.*;
 
 @Data
 @Builder
-@AllArgsConstructor
+@Entity
+@Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
-    @PositiveOrZero(message = "ID не может быть меньше ноля")
+    @Id
     @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @NotBlank(message = "Имя не должен быть пустым")
+    @Column(nullable = false, length = 512)
     private String name;
-    @NotBlank(message = "Почта не должна быть пустой")
-    @Email(message = "Некорректная почта")
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 }

@@ -1,18 +1,18 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
+    @PositiveOrZero(message = "ID не может быть меньше ноля")
+    @EqualsAndHashCode.Include
     private long id;
     @NotBlank(message = "Имя не должен быть пустым")
     private String name;
