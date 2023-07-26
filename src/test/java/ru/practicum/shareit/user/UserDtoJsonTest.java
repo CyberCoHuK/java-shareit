@@ -22,7 +22,7 @@ public class UserDtoJsonTest {
         UserDto userDto = owner;
         JsonContent<UserDto> result = json.write(userDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(0);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("owner");
         assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("owner@mail.com");
     }

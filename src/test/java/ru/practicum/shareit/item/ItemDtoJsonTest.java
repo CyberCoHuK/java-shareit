@@ -22,7 +22,7 @@ public class ItemDtoJsonTest {
         ItemDto itemDto = TestUtils.item;
         JsonContent<ItemDto> result = json.write(itemDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(0);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("item");
         assertThat(result).extractingJsonPathStringValue("$.description").isEqualTo("description");
         assertThat(result).extractingJsonPathBooleanValue("$.available").isEqualTo(true);

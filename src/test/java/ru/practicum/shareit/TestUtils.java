@@ -1,6 +1,7 @@
 package ru.practicum.shareit;
 
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.enums.BookingStatus;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -13,22 +14,18 @@ import java.util.List;
 public class TestUtils {
     public static LocalDateTime now = LocalDateTime.of(2024, 12, 12, 10, 0, 0);
     public static UserDto owner = UserDto.builder()
-            .id(1L)
             .name("owner")
             .email("owner@mail.com")
             .build();
     public static UserDto booker = UserDto.builder()
-            .id(1L)
             .name("booker")
             .email("booker@mail.com")
             .build();
     public static UserDto requester = UserDto.builder()
-            .id(1L)
             .name("requester")
             .email("requestor@mail.com")
             .build();
     public static ItemDto item = ItemDto.builder()
-            .id(1L)
             .name("item")
             .description("description")
             .available(true)
@@ -48,8 +45,15 @@ public class TestUtils {
             .booker(booker)
             .status(BookingStatus.WAITING).build();
     public static BookingDtoShort bookingShort = BookingDtoShort.builder()
-            .itemId(item.getId())
+            .itemId(1L)
             .start(now)
             .end(now.plusDays(8))
+            .build();
+
+    public static BookingDtoItem bookingDtoItem = BookingDtoItem.builder()
+            .start(now)
+            .end(now.plusDays(8))
+            .bookerId(1L)
+            .item(item)
             .build();
 }

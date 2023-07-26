@@ -6,26 +6,24 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.TestUtils;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoItem;
 
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-public class BookingDtoJsonTest {
+public class BookingDtoItemJsonTest {
     @Autowired
-    JacksonTester<BookingDto> json;
+    JacksonTester<BookingDtoItem> json;
 
     @Test
-    void testBookingDto() throws IOException {
-        BookingDto bookingDto = TestUtils.booking;
-        JsonContent<BookingDto> result = json.write(bookingDto);
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
+    void testBookingDtoItem() throws IOException {
+        BookingDtoItem bookingDtoItem = TestUtils.bookingDtoItem;
+        JsonContent<BookingDtoItem> result = json.write(bookingDtoItem);
         assertThat(result).extractingJsonPathNumberValue("$.item.id").isEqualTo(0);
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo("2024-12-12T10:00:00");
         assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo("2024-12-20T10:00:00");
-        assertThat(result).extractingJsonPathNumberValue("$.booker.id").isEqualTo(0);
-        assertThat(result).extractingJsonPathStringValue("$.status").isEqualTo("WAITING");
+        assertThat(result).extractingJsonPathNumberValue("$.bookerId").isEqualTo(1);
     }
 }

@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.enums.BookingStatus;
+import ru.practicum.shareit.exceptions.BadRequestException;
+import ru.practicum.shareit.exceptions.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -31,7 +34,6 @@ class IntegrationBookingTest {
         UserDto savedUser = userService.createUser(owner);
         UserDto savedBooker = userService.createUser(booker);
         ItemDto savedItem = itemService.createItem(item, savedUser.getId());
-        System.out.println(userService.getAllUsers());
         BookingDto bookingDto = bookingService.createBooking(bookingShort, savedBooker.getId());
         BookingDto gotBooking = bookingService.getBookingByUser(savedBooker.getId(), bookingDto.getId());
         assertThat(gotBooking.getId(), notNullValue());
@@ -40,5 +42,30 @@ class IntegrationBookingTest {
         assertThat(gotBooking.getStatus(), equalTo(BookingStatus.WAITING));
         assertThat(gotBooking.getStart(), equalTo(bookingShort.getStart()));
         assertThat(gotBooking.getEnd(), equalTo(bookingShort.getEnd()));
+        userService.deleteUserById(savedUser.getId());
+        userService.deleteUserById(savedBooker.getId());
+    }
+
+    @Test
+    public void ExceptionTest() {
+        UserDto savedUser = userService.createUser(owner);
+        UserDto savedBooker = userService.createUser(booker);
+        BookingDtoShort bookingDtoShort = bookingShort;
+        try {
+            bookingService.createBooking(bookingShort, savedBooker.getId());
+        } catch (ObjectNotFoundException e) {
+            assertThat(e.getMessage(), equalTo("Вещи с id = 1 не существует"));
+        }
+        ItemDto savedItem = itemService.createItem(item, savedUser.getId());
+        bookingDtoShort.setItemId(savedItem.getId());
+        savedItem.setAvailable(false);
+        itemService.updateItem(savedItem, savedUser.getId(), savedItem.getId());
+        try {
+            bookingService.createBooking(bookingShort, savedBooker.getId());
+        } catch (BadRequestException e) {
+            assertThat(e.getMessage(), equalTo("Вещь не доступна. Невозможно создать бронирование"));
+        }
+        userService.deleteUserById(savedUser.getId());
+        userService.deleteUserById(savedBooker.getId());
     }
 }
