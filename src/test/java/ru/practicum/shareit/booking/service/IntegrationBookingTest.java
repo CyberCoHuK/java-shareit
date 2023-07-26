@@ -47,7 +47,7 @@ class IntegrationBookingTest {
     }
 
     @Test
-    public void ExceptionTest() {
+    public void exceptionTest() {
         UserDto savedUser = userService.createUser(owner);
         UserDto savedBooker = userService.createUser(booker);
         BookingDtoShort bookingDtoShort = bookingShort;
