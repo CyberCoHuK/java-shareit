@@ -1,26 +1,32 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
 
+@Validated
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @GetMapping
-    public Collection<ItemDtoResponse> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId) {
-        return itemService.getAllItemOfUser(userId);
+    public Collection<ItemDtoResponse> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId,
+                                                        @RequestParam(defaultValue = "0") @Min(0) int from,
+                                                        @RequestParam(defaultValue = "20") @Positive int size) {
+        return itemService.getAllItemOfUser(userId, from, size);
     }
 
     @GetMapping("/{itemId}")
@@ -29,8 +35,10 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> searchItem(@RequestParam String text) {
-        return itemService.searchItem(text);
+    public Collection<ItemDto> searchItem(@RequestParam String text,
+                                          @RequestParam(defaultValue = "0") @Min(0) int from,
+                                          @RequestParam(defaultValue = "20") @Positive int size) {
+        return itemService.searchItem(text, from, size);
     }
 
     @PostMapping

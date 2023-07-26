@@ -1,6 +1,8 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -39,13 +43,15 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final BookingRepository bookingRepository;
+    private final RequestRepository requestRepository;
     private final Sort sort = Sort.by(START.getSort()).descending();
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDtoResponse> getAllItemOfUser(long userId) {
+    public Collection<ItemDtoResponse> getAllItemOfUser(long userId, Integer from, Integer size) {
         userRepository.isExist(userId);
-        Collection<Item> items = itemRepository.findAllByOwnerId(userId);
+        PageRequest page = PageRequest.of(from / size, size);
+        Page<Item> items = itemRepository.findAllByOwnerId(userId, page);
         List<ItemDtoResponse> dtoItems = new ArrayList<>();
         for (Item it : items) {
             dtoItems.add(getItemDtoWithBooking(it));
@@ -57,8 +63,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDtoResponse getItemById(long userId, long itemId) {
         userRepository.isExist(userId);
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
+        Item item = getItem(itemId);
         ItemDtoResponse itemDto = getItemDtoWithBooking(item);
         if (item.getOwner().getId() != userId) {
             itemDto.setLastBooking(null);
@@ -69,13 +74,62 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDto> searchItem(String text) {
+    public Collection<ItemDto> searchItem(String text, Integer from, Integer size) {
+        PageRequest page = PageRequest.of(from / size, size);
         if (!StringUtils.hasLength(text)) {
             return Collections.emptyList();
         }
-        return itemRepository.findByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text).stream()
+        return itemRepository.findByNameOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text, page).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Override
+    public ItemDto createItem(ItemDto itemDto, long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + userId + " не существует"));
+        Item item = ItemMapper.toItem(itemDto, user);
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = requestRepository.findById(itemDto.getRequestId()).orElse(null);
+        }
+        item.setItemRequest(itemRequest);
+        return ItemMapper.toItemDto(itemRepository.save(item));
+    }
+
+    @Transactional
+    @Override
+    public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
+        userRepository.isExist(userId);
+        Item updateItem = getItem(itemId);
+        Optional.ofNullable(itemDto.getName()).ifPresent(updateItem::setName);
+        Optional.ofNullable(itemDto.getDescription()).ifPresent(updateItem::setDescription);
+        Optional.ofNullable(itemDto.getAvailable()).ifPresent(updateItem::setAvailable);
+        itemRepository.save(updateItem);
+        return ItemMapper.toItemDto(updateItem);
+    }
+
+    @Transactional(readOnly = true)
+    private Item getItem(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
+    }
+
+    @Transactional
+    @Override
+    public CommentDtoResponse createComment(CommentDto commentDto, long userId, long itemId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + userId + " не существует"));
+        Item item = getItem(itemId);
+        Collection<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatusAndStartBefore(itemId,
+                userId, APPROVED, LocalDateTime.now());
+        if (bookings == null || bookings.isEmpty()) {
+            throw new BadRequestException("Бронирований не найдено");
+        }
+        Comment comment = CommentMapper.toComment(commentDto, user, item, LocalDateTime.now());
+        comment = commentRepository.save(comment);
+        return CommentMapper.toDtoResponse(comment);
     }
 
     @Transactional(readOnly = true)
@@ -98,44 +152,5 @@ public class ItemServiceImpl implements ItemService {
                 .map(CommentMapper::toDtoResponse)
                 .collect(Collectors.toList());
         return ItemMapper.toItemDtoWithBooking(item, next, last, comments);
-    }
-
-    @Transactional
-    @Override
-    public ItemDto createItem(ItemDto itemDto, long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + userId + " не существует"));
-        Item item = itemRepository.save(ItemMapper.toItem(itemDto, user));
-        return ItemMapper.toItemDto(item);
-    }
-
-    @Transactional
-    @Override
-    public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
-        userRepository.isExist(userId);
-        Item updateItem = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
-        Optional.ofNullable(itemDto.getName()).ifPresent(updateItem::setName);
-        Optional.ofNullable(itemDto.getDescription()).ifPresent(updateItem::setDescription);
-        Optional.ofNullable(itemDto.getAvailable()).ifPresent(updateItem::setAvailable);
-        itemRepository.save(updateItem);
-        return ItemMapper.toItemDto(updateItem);
-    }
-
-    @Transactional
-    @Override
-    public CommentDtoResponse createComment(CommentDto commentDto, long userId, long itemId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + userId + " не существует"));
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
-        Collection<Booking> bookings = bookingRepository.findAllByItemIdAndBookerIdAndStatusAndStartBefore(itemId,
-                userId, APPROVED, LocalDateTime.now());
-        if (bookings == null || bookings.isEmpty()) {
-            throw new BadRequestException("Бронирований не найдено");
-        }
-        Comment comment = CommentMapper.toComment(commentDto, user, item, LocalDateTime.now());
-        commentRepository.save(comment);
-        return CommentMapper.toDtoResponse(comment);
     }
 }
