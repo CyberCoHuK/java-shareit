@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,6 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static ru.practicum.shareit.enums.BookingStates.*;
 import static ru.practicum.shareit.enums.BookingStatus.APPROVED;
+import static ru.practicum.shareit.enums.Sorts.START;
 
 class BookingServiceImplTest {
     private final BookingRepository bookingRepository = mock(BookingRepository.class);
@@ -192,5 +196,18 @@ class BookingServiceImplTest {
                 any(LocalDateTime.class), any(Pageable.class));
         verify(bookingRepository, times(2)).findAllByItemOwnerAndStatusEquals(any(User.class),
                 any(BookingStatus.class), any(Pageable.class));
+    }
+
+    @Test
+    void getBookingDtoItemTest() {
+        when(bookingRepository.findAllByItem(any(Item.class), any(Sort.class)))
+                .thenReturn(List.of(booking));
+        Sort sort = Sort.by(START.getSort()).descending();
+        Collection<BookingDtoItem> result = bookingRepository.findAllByItem(item, sort).stream()
+                .map(BookingMapper::toBookingDtoItem)
+                .collect(Collectors.toList());
+        assertNotNull(result);
+        assertEquals(List.of(BookingMapper.toBookingDtoItem(booking)), result);
+        verify(bookingRepository, times(1)).findAllByItem(any(Item.class), any(Sort.class));
     }
 }
