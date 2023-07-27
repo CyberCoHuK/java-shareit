@@ -54,7 +54,6 @@ class BookingServiceImplTest {
 
     }
 
-
     @Test
     void createBooking() {
         BookingDtoShort bookingDtoS = new BookingDtoShort(bookingDto.getStart(), bookingDto.getEnd(), item.getId());

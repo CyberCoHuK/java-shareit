@@ -15,7 +15,7 @@ import static ru.practicum.shareit.TestUtils.request;
 @JsonTest
 public class RequestDtoJsonTest {
     @Autowired
-    JacksonTester<ItemRequestDto> json;
+    private JacksonTester<ItemRequestDto> json;
 
     @Test
     void testUserDto() throws IOException {

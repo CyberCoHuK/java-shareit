@@ -65,7 +65,7 @@ public class BookingServiceImpl implements BookingService {
         userRepository.isExist(userId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ObjectNotFoundException("Бронирования с id = " + bookingId + " не существует"));
-        if (!booking.getStatus().equals(WAITING)) {
+        if (booking.getStatus() != WAITING) {
             throw new BadRequestException("Невозможно забронировать вещь со статусом: " + booking.getStatus());
         }
         if (booking.getItem().getOwner().getId() != userId) {

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.mapper;
 
 import lombok.NonNull;
+import org.springframework.util.CollectionUtils;
 import ru.practicum.shareit.booking.dto.BookingDtoItem;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -47,7 +48,7 @@ public class ItemMapper {
     }
 
     public static List<ItemDto> toItemForRequestDto(List<Item> items) {
-        if (items == null) {
+        if (CollectionUtils.isEmpty(items)) {
             return Collections.emptyList();
         }
         return items.stream().map(ItemMapper::toItemDto).collect(Collectors.toList());

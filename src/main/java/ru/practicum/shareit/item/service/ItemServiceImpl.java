@@ -23,7 +23,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -90,11 +89,9 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + userId + " не существует"));
         Item item = ItemMapper.toItem(itemDto, user);
-        ItemRequest itemRequest = null;
         if (itemDto.getRequestId() != null) {
-            itemRequest = requestRepository.findById(itemDto.getRequestId()).orElse(null);
+            item.setItemRequest(requestRepository.findById(itemDto.getRequestId()).orElse(null));
         }
-        item.setItemRequest(itemRequest);
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -108,12 +105,6 @@ public class ItemServiceImpl implements ItemService {
         Optional.ofNullable(itemDto.getAvailable()).ifPresent(updateItem::setAvailable);
         itemRepository.save(updateItem);
         return ItemMapper.toItemDto(updateItem);
-    }
-
-    @Transactional(readOnly = true)
-    private Item getItem(long itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
     }
 
     @Transactional
@@ -132,7 +123,11 @@ public class ItemServiceImpl implements ItemService {
         return CommentMapper.toDtoResponse(comment);
     }
 
-    @Transactional(readOnly = true)
+    private Item getItem(long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new ObjectNotFoundException("Вещи с id = " + itemId + " не существует"));
+    }
+
     private ItemDtoResponse getItemDtoWithBooking(Item item) {
         LocalDateTime now = LocalDateTime.now();
         Collection<BookingDtoItem> bookings = bookingRepository.findAllByItem(item, sort)
@@ -145,7 +140,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElse(null);
         BookingDtoItem next = bookings.stream()
                 .sorted(BOOKING_COMPARATOR)
-                .filter(b -> b.getStart().isAfter(now) && b.getStatus().equals(APPROVED))
+                .filter(b -> b.getStart().isAfter(now) && b.getStatus() == APPROVED)
                 .findFirst()
                 .orElse(null);
         List<CommentDtoResponse> comments = commentRepository.findAllByItemId(item.getId()).stream()
