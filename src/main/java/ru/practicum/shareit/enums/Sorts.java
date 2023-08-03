@@ -4,7 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum Sorts {
-    START("start");
+    START("start"),
+    CREATED("created");
 
     private final String sort;
 

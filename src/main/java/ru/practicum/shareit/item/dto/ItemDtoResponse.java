@@ -20,6 +20,6 @@ public class ItemDtoResponse {
     private Boolean available;
     private BookingDtoItem lastBooking;
     private BookingDtoItem nextBooking;
-    private Long request;
+    private Long requestId;
     private List<CommentDtoResponse> comments;
 }
