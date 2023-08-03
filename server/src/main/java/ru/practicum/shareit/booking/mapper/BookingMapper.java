@@ -33,6 +33,9 @@ public class BookingMapper {
     }
 
     public static BookingDtoItem toBookingDtoItem(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
         return BookingDtoItem.builder()
                 .id(booking.getId())
                 .bookerId(booking.getBooker().getId())

@@ -2,7 +2,8 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.NonNull;
 import org.springframework.util.CollectionUtils;
-import ru.practicum.shareit.booking.dto.BookingDtoItem;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.dto.CommentDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoResponse;
@@ -33,15 +34,15 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemDtoResponse toItemDtoWithBooking(Item item, BookingDtoItem next, BookingDtoItem last,
+    public static ItemDtoResponse toItemDtoWithBooking(Item item, Booking next, Booking last,
                                                        List<CommentDtoResponse> comments) {
         return ItemDtoResponse.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .nextBooking(next)
-                .lastBooking(last)
+                .nextBooking(BookingMapper.toBookingDtoItem(next))
+                .lastBooking(BookingMapper.toBookingDtoItem(last))
                 .requestId(item.getItemRequest() == null ? null : item.getItemRequest().getId())
                 .comments(comments)
                 .build();

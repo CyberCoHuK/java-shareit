@@ -9,7 +9,7 @@ import ru.practicum.shareit.request.service.RequestService;
 
 import java.util.Collection;
 
-
+@Validated
 @RestController
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
