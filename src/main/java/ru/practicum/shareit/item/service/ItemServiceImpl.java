@@ -7,8 +7,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import ru.practicum.shareit.booking.dto.BookingDtoItem;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BadRequestException;
@@ -37,7 +35,7 @@ import static ru.practicum.shareit.enums.Sorts.START;
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
-    private static final Comparator<BookingDtoItem> BOOKING_COMPARATOR = Comparator.comparing(BookingDtoItem::getStart);
+    private static final Comparator<Booking> BOOKING_COMPARATOR = Comparator.comparing(Booking::getStart);
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
@@ -130,15 +128,14 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemDtoResponse getItemDtoWithBooking(Item item) {
         LocalDateTime now = LocalDateTime.now();
-        Collection<BookingDtoItem> bookings = bookingRepository.findAllByItem(item, sort)
-                .stream().map(BookingMapper::toBookingDtoItem).collect(Collectors.toList());
-        BookingDtoItem last = bookings.stream()
+        Collection<Booking> bookings = bookingRepository.findAllByItem(item, sort);
+        Booking last = bookings.stream()
                 .sorted(BOOKING_COMPARATOR)
                 .filter(b -> b.getStart().isBefore(now))
                 .reduce((first, second) -> second).stream()
                 .findFirst()
                 .orElse(null);
-        BookingDtoItem next = bookings.stream()
+        Booking next = bookings.stream()
                 .sorted(BOOKING_COMPARATOR)
                 .filter(b -> b.getStart().isAfter(now) && b.getStatus() == APPROVED)
                 .findFirst()
