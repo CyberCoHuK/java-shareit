@@ -48,12 +48,6 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new BadRequestException("Вещь не доступна. Невозможно создать бронирование");
         }
-        if (bookingDtoShort.getEnd().isBefore(bookingDtoShort.getStart()) ||
-                bookingDtoShort.getEnd().isEqual(bookingDtoShort.getStart())) {
-            throw new BadRequestException(
-                    "Дата окончания не может быть раньше или равна дате начала бронирования." +
-                            " Невозможно создать бронирование");
-        }
         Booking booking = BookingMapper.toBooking(bookingDtoShort, user, item);
         booking = bookingRepository.save(booking);
         return BookingMapper.toBookingDto(booking);
@@ -92,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingDto> getAllBookingsByUser(Long userId, BookingStates state, Integer from, Integer size) {
         userRepository.isExist(userId);
-        Page<Booking> bookings;
+        Page<Booking> bookings = Page.empty();
         PageRequest page = PageRequest.of(from / size, size, sort);
         switch (state) {
             case ALL:
@@ -114,8 +108,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findAllByBookerIdAndStatusEquals(userId, REJECTED, page);
                 break;
-            default:
-                throw new BadRequestException("Unknown state: " + state);
         }
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
@@ -125,7 +117,7 @@ public class BookingServiceImpl implements BookingService {
     public Collection<BookingDto> getAllBookingsByOwner(Long ownerId, BookingStates state, Integer from, Integer size) {
         User owner = userRepository.findById(ownerId)
                 .orElseThrow(() -> new ObjectNotFoundException("Пользователя с id = " + ownerId + " не существует"));
-        Page<Booking> bookings;
+        Page<Booking> bookings = Page.empty();
         PageRequest page = PageRequest.of(from / size, size, sort);
         switch (state) {
             case ALL:
@@ -147,8 +139,6 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED:
                 bookings = bookingRepository.findAllByItemOwnerAndStatusEquals(owner, REJECTED, page);
                 break;
-            default:
-                throw new BadRequestException("Unknown state: " + state);
         }
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
