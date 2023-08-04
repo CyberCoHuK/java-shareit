@@ -14,8 +14,8 @@ import java.util.Collection;
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {
-    private final RequestService requestService;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+    private final RequestService requestService;
 
     @PostMapping
     public ItemRequestDto createRequest(@RequestHeader(USER_ID_HEADER) long userId,

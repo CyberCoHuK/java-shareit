@@ -13,12 +13,14 @@ public class ExceptionsHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleWrongStateException(final WrongStateException e) {
+        log.warn("WrongStateException: " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleWrongTimeException(final WrongStartEndTimeException e) {
+        log.warn("WrongStartEndTimeException: " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 }

@@ -80,11 +80,9 @@ public class BaseClient {
 
         ResponseEntity<Object> shareitServerResponse;
         try {
-            if (parameters != null) {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
-            } else {
-                shareitServerResponse = rest.exchange(path, method, requestEntity, Object.class);
-            }
+            shareitServerResponse = (parameters != null) ?
+                    rest.exchange(path, method, requestEntity, Object.class, parameters) :
+                    rest.exchange(path, method, requestEntity, Object.class);
         } catch (HttpStatusCodeException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
         }

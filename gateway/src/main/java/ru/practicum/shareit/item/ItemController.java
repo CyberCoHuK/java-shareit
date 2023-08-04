@@ -17,8 +17,8 @@ import javax.validation.constraints.Positive;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
-    private final ItemClient itemClient;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+    private final ItemClient itemClient;
 
     @GetMapping
     public ResponseEntity<Object> getAllItemOfUser(@RequestHeader(USER_ID_HEADER) long userId,

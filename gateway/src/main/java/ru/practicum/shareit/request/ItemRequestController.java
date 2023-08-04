@@ -16,8 +16,8 @@ import javax.validation.constraints.Positive;
 @RequestMapping(path = "/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {
-    private final ItemRequestClient itemRequestClient;
     private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+    private final ItemRequestClient itemRequestClient;
 
     @PostMapping
     public ResponseEntity<Object> createRequest(@RequestHeader(USER_ID_HEADER) long userId,
