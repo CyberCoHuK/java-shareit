@@ -50,6 +50,7 @@
 ---
 Схема базы данных
 ---
+![Explore With Me Stat Service (1)](https://github.com/CyberCoHuK/java-shareit/assets/108213849/9f541391-9038-46ac-982e-879287d26c37)
 
 Установка и запуск проекта
 ---
