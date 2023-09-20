@@ -43,11 +43,11 @@
 ---
 
 ## Установка и запуск проекта
-Необходимо настроенная система виртуализации, установленный Docker Desktop(скачать и установить можно с официального сайта https://www.docker.com/products/docker-desktop/)
+Необходимо настроенная система виртуализации, установленный [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
 1. Клонируйте репозиторий проекта на свою локальную машину:
    ```
-   git clone git@github.com:cybercohuk/java-shareit.git
+   git clone git@github.com:CyberCoHuK/java-shareit.git
    ```
 2. Запустите коммандную строку и перейдите в коррень директории с проектом.
 3. Соберите проект
