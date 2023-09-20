@@ -1,6 +1,6 @@
 # Shareit
 
-Технологии: Java + Spring Boot + Docker + PostgreSQL + Hibernate + Maven + JUnit5 + Mockito + RESTful API + MapStruct + Lombok
+***Стек: Java, Spring Boot, Docker, PostgreSQL, Hibernate, Maven, JUnit, Mockito, RESTful API, Lombok***
 
 ---
 Сервис решает проблему связанную с необходимостью приобретения вещей для временного использования. Вместо того, чтобы покупать новую вещь, пользователи могут найти ее на сервисе и взять в аренду на определенное время. Это позволяет экономить деньги и ресурсы, а также уменьшает нагрузку на окружающую среду.
